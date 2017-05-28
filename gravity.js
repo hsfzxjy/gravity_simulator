@@ -156,10 +156,14 @@ var mouse = {
     v: new Vector()
 }
 
-var gravity = 0.5, particles = []
+var gravity = 45, particles = []
 
 $('#vvector').change(function () {
     showVVector = $(this).is(':checked')
+})
+
+$('#gravity').change(function () {
+    gravity = +$(this).val()
 })
 
 $(window)
