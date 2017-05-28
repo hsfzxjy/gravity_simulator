@@ -2,10 +2,24 @@
 <html>
     <head>
         <link rel="stylesheet" href="./gravity.css">
+        <title>Gravity Simulator for the GODDAMN Physics Lesson</title>
     </head>
     <body>
-        <canvas id="canvas" width="500" height="400">
-            Please update your browser to enjoy the game.
+        <div id="control-box">
+            Press <kbd>A</kbd> to zoom out, and <kbd>S</kbd> to zoom in.
+            <br>
+            Press <kbd>&#x2190;</kbd>, <kbd>&#x2191;</kbd>, <kbd>&#x2192;</kbd>, <kbd>&#x2193;</kbd> to move the viewport.
+            <br><br>
+            Click anywhere in the right box, and the system will generate an object with random mass. You may drag your mouse before releasing it to give the object an initial velocity.
+            <br><br>
+            Have fun!
+            <br><br>
+            <input type="checkbox" id="vvector"><label for="vvector">show velocity vector</label>
+            <br><br>
+            <button onclick="location.reload()">reset</button>
+        </div>
+        <canvas id="canvas" width="600" height="500">
+            Please update your browser to enjoy the simulation.
         </canvas>
     </body>
     <script src='./jquery-3.2.1.slim.min.js'></script>

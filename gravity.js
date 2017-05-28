@@ -57,14 +57,6 @@ Vector.prototype = {
         }
     },
 
-    reverse: function () {
-        return this.mul(-1)
-    },
-
-    abs: function () {
-        return new Vector(Math.abs(this.x), Math.abs(this.y))
-    },
-
     dot: function (operand) {
         return this.x * operand.x + this.y * operand.y
     },
@@ -79,10 +71,6 @@ Vector.prototype = {
 
     setLength: function (len) {
         return this.normalize().mul(l)
-    },
-
-    lerp: function (v, s) {
-        return new Vector(this.x + (v.x - this.x) * s, this.y + (v.y - this.y) * s)
     },
 
     normalize: function () {
@@ -104,17 +92,8 @@ Vector.prototype = {
     distSq: function (v) {
         var dx = this.x - v.x, dy = this.y - v.y
         return dx * dx + dy * dy
-    },
-
-    cross: function (v) {
-        return this.x * v.y - this.y * v.x
     }
 }
-
-Math.sign = Math.sign || function (x) {
-    return x === 0 ? 0 : x > 0 ? 1 : -1
-}
-
 
 function Circle (c, r, v) {
     this.c = c
@@ -123,7 +102,7 @@ function Circle (c, r, v) {
     this.v = v
     this.a = new Vector()
 
-    var color = (~~(Math.random() * 0xfffff)).toString(16)
+    var color = (~~(Math.random() * 0xffffff)).toString(16)
     while (color.length < 6) color = '0' + color
     this.color = '#' + color
 }
@@ -162,6 +141,7 @@ var refreshFunction = (
 
 var canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
 var w = canvas.width, h = canvas.height, scale = 1, origin = new Vector(0, 0)
+var showVVector = false
 
 function translate (realx, realy) {
     var tx = realx / scale, ty = realy / scale
@@ -178,57 +158,53 @@ var mouse = {
 
 var gravity = 0.5, particles = []
 
-// window.addEventListener('resize', function () {
-//     var style = window.getComputedStyle(canvas), reg = /\d+/
-//     w = canvas.width = +reg.exec(style.width)[0]
-//     h = canvas.height = +reg.exec(style.height)[0]
-// })
-
-$(window).on('keypress', function (e) {
-    var times = e.key === 'a' ? 0.95 : e.key === 's' ? 1 / 0.95 : 1
-    if (scale * times > 0.1 && scale * times < 10) {
-        scale *= times
-        ctx.scale(times, times)
-    }
+$('#vvector').change(function () {
+    showVVector = $(this).is(':checked')
 })
 
-$(window).on('keydown', function (e) {
-    switch (e.which) {
-        case 37:
-            translate(-10, 0);
-            break;
-        case 38:
-            translate(0, -10);
-            break;
-        case 39:
-            translate(10, 0);
-            break;
-        case 40:
-            translate(0, 10);
-            break;
-    }
-})
-
-window.addEventListener('mousemove', function (e) {
-
-})
-
-window.addEventListener('mousedown', function (e) {
-    var rect = canvas.getBoundingClientRect()
-    mouse.p.x = e.pageX - rect.left
-    mouse.p.y = e.pageY - rect.top
-    mouse.v.set(0)
-    mouse.circle = new Circle(mouse.p.sub(origin).div(scale), Math.random() * 10 + 15, new Vector(), 0.95, 0.95)
-})
-
-window.addEventListener('mouseup', function (e) {
-    var rect = canvas.getBoundingClientRect()
-    var destx = e.pageX - rect.left
-    var desty = e.pageY - rect.top
-    mouse.v.set(new Vector(destx, desty).sub(mouse.p).div(50))
-    mouse.circle.v.set(mouse.v)
-    particles.push(mouse.circle)
-})
+$(window)
+    .on('keypress', function (e) {
+        var times = e.key === 'a' ? 0.95 : e.key === 's' ? 1 / 0.95 : 1
+        if (scale * times > 0.1 && scale * times < 10) {
+            scale *= times
+            ctx.scale(times, times)
+            var delta = new Vector(w / 2, h / 2).sub(origin).mul(1 - times)
+            translate(delta.x, delta.y)
+        }
+    })
+    .on('keydown', function (e) {
+        switch (e.which) {
+            case 37:
+                translate(-10, 0);
+                break;
+            case 38:
+                translate(0, -10);
+                break;
+            case 39:
+                translate(10, 0);
+                break;
+            case 40:
+                translate(0, 10);
+                break;
+        }
+    })
+    .on('mousedown', function (e) {
+        e = e.originalEvent
+        var rect = canvas.getBoundingClientRect()
+        mouse.p.x = e.pageX - rect.left
+        mouse.p.y = e.pageY - rect.top
+        mouse.v.set(0)
+        mouse.circle = new Circle(mouse.p.sub(origin).div(scale), Math.random() * 10 + 15, new Vector())
+    })
+    .on('mouseup', function (e) {
+        e = e.originalEvent
+        var rect = canvas.getBoundingClientRect()
+        var destx = e.pageX - rect.left
+        var desty = e.pageY - rect.top
+        mouse.v.set(new Vector(destx, desty).sub(mouse.p).div(50))
+        mouse.circle.v.set(mouse.v)
+        particles.push(mouse.circle)
+    })
 
 function computeForces () {
     for (var i = 0; i < particles.length; i++) {
@@ -284,12 +260,22 @@ function render () {
 
     for (var i = 0; i < particles.length; i++) {
         var p = particles[i]
-        // ctx.scale(scale, scale)
         ctx.beginPath()
         ctx.arc(p.c.x, p.c.y, p.r, 0, Math.PI * 2, false)
         ctx.fillStyle = p.color
         ctx.fill()
         ctx.closePath()
+
+        if (showVVector) {
+            ctx.strokeStyle = '#ffffff'
+            ctx.lineWidth = 2
+            ctx.setLineDash([4, 2])
+            ctx.beginPath()
+            ctx.moveTo(p.c.x, p.c.y)
+            var dest = p.c.add(p.v.mul(30))
+            ctx.lineTo(dest.x, dest.y)
+            ctx.stroke()
+        }
     }
 }
 
