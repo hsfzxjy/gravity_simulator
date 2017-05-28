@@ -14,9 +14,13 @@
             <br><br>
             Have fun!
             <br><br>
-            <input type="checkbox" id="vvector"><label for="vvector">show velocity vector</label>
+            <input type="checkbox" id="vvector" checked><label for="vvector">show velocity vector</label>
+            <br>
+            <label for="size">Size: </label>
+            <input type="number" max="100" min="1" id="size" value="10">
             <br><br>
             <button onclick="location.reload()">reset</button>
+            &nbsp; <span id="counter"></span>
         </div>
         <canvas id="canvas" width="600" height="500">
             Please update your browser to enjoy the simulation.

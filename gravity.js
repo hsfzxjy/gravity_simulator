@@ -141,7 +141,7 @@ var refreshFunction = (
 
 var canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
 var w = canvas.width, h = canvas.height, scale = 1, origin = new Vector(0, 0)
-var showVVector = false
+var showVVector = true
 
 function translate (realx, realy) {
     var tx = realx / scale, ty = realy / scale
@@ -165,7 +165,7 @@ $('#vvector').change(function () {
 $(window)
     .on('keypress', function (e) {
         var times = e.key === 'a' ? 0.95 : e.key === 's' ? 1 / 0.95 : 1
-        if (scale * times > 0.1 && scale * times < 10) {
+        if (scale * times > 0.01 && scale * times < 10) {
             scale *= times
             ctx.scale(times, times)
             var delta = new Vector(w / 2, h / 2).sub(origin).mul(1 - times)
@@ -175,26 +175,29 @@ $(window)
     .on('keydown', function (e) {
         switch (e.which) {
             case 37:
-                translate(-10, 0);
-                break;
-            case 38:
-                translate(0, -10);
-                break;
-            case 39:
                 translate(10, 0);
                 break;
-            case 40:
+            case 38:
                 translate(0, 10);
+                break;
+            case 39:
+                translate(-10, 0);
+                break;
+            case 40:
+                translate(0, -10);
                 break;
         }
     })
+
+$(canvas)
     .on('mousedown', function (e) {
         e = e.originalEvent
         var rect = canvas.getBoundingClientRect()
         mouse.p.x = e.pageX - rect.left
         mouse.p.y = e.pageY - rect.top
         mouse.v.set(0)
-        mouse.circle = new Circle(mouse.p.sub(origin).div(scale), Math.random() * 10 + 15, new Vector())
+        var sizeBase = +$("#size").val()
+        mouse.circle = new Circle(mouse.p.sub(origin).div(scale), Math.random() * sizeBase + 15, new Vector())
     })
     .on('mouseup', function (e) {
         e = e.originalEvent
@@ -204,6 +207,7 @@ $(window)
         mouse.v.set(new Vector(destx, desty).sub(mouse.p).div(50))
         mouse.circle.v.set(mouse.v)
         particles.push(mouse.circle)
+        $("#counter").html(particles.length)
     })
 
 function computeForces () {
