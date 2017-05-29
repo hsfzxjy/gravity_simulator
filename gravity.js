@@ -128,92 +128,6 @@ function resCol (a, b) {
     }
 }
 
-var refreshFunction = (
-    window.requestAnimationFrame ||
-    window.webkitRequestAnimationFrame ||
-    window.mozRequestAnimationFrame ||
-    window.oRequestAnimationFrame ||
-    window.msRequestAnimationFrame ||
-    function (callback) {
-        setTimeout(callback, 1000 / 60)
-    }
-)
-
-var canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
-var w = canvas.width, h = canvas.height, scale = 1, origin = new Vector(0, 0)
-var showVVector = true
-
-function translate (realx, realy) {
-    var tx = realx / scale, ty = realy / scale
-    origin.set(origin.add(new Vector(realx, realy)))
-    ctx.translate(tx, ty)
-}
-
-translate(w / 2, h / 2)
-
-var mouse = {
-    p: new Vector(),
-    v: new Vector()
-}
-
-var gravity = 45, particles = []
-
-$('#vvector').change(function () {
-    showVVector = $(this).is(':checked')
-})
-
-$('#gravity').change(function () {
-    gravity = +$(this).val()
-})
-
-$(window)
-    .on('keypress', function (e) {
-        var times = e.key === 'a' ? 0.95 : e.key === 's' ? 1 / 0.95 : 1
-        if (scale * times > 0.01 && scale * times < 10) {
-            scale *= times
-            ctx.scale(times, times)
-            var delta = new Vector(w / 2, h / 2).sub(origin).mul(1 - times)
-            translate(delta.x, delta.y)
-        }
-    })
-    .on('keydown', function (e) {
-        switch (e.which) {
-            case 37:
-                translate(10, 0);
-                break;
-            case 38:
-                translate(0, 10);
-                break;
-            case 39:
-                translate(-10, 0);
-                break;
-            case 40:
-                translate(0, -10);
-                break;
-        }
-    })
-
-$(canvas)
-    .on('mousedown', function (e) {
-        e = e.originalEvent
-        var rect = canvas.getBoundingClientRect()
-        mouse.p.x = e.pageX - rect.left
-        mouse.p.y = e.pageY - rect.top
-        mouse.v.set(0)
-        var sizeBase = +$("#size").val()
-        mouse.circle = new Circle(mouse.p.sub(origin).div(scale), Math.random() * sizeBase + 15, new Vector())
-    })
-    .on('mouseup', function (e) {
-        e = e.originalEvent
-        var rect = canvas.getBoundingClientRect()
-        var destx = e.pageX - rect.left
-        var desty = e.pageY - rect.top
-        mouse.v.set(new Vector(destx, desty).sub(mouse.p).div(50))
-        mouse.circle.v.set(mouse.v)
-        particles.push(mouse.circle)
-        $("#counter").html(particles.length)
-    })
-
 function computeForces () {
     for (var i = 0; i < particles.length; i++) {
         var p = particles[i]
@@ -256,6 +170,133 @@ function doPhysics (dt) {
     }
     computeCollision()
 }
+
+var refreshFunction = (
+    window.requestAnimationFrame ||
+    window.webkitRequestAnimationFrame ||
+    window.mozRequestAnimationFrame ||
+    window.oRequestAnimationFrame ||
+    window.msRequestAnimationFrame ||
+    function (callback) {
+        setTimeout(callback, 1000 / 60)
+    }
+)
+
+var canvas = document.getElementById('canvas'), ctx = canvas.getContext('2d')
+var w = canvas.width, h = canvas.height, scale = 1, origin = new Vector(0, 0)
+var showVVector = true
+
+function scaleContext (times) {
+    scale *= times
+    ctx.scale(times, times)
+
+    if (typeof window.localStorage === 'object') {
+        localStorage.setItem('scale', scale)
+    }
+}
+
+if (typeof window.localStorage === 'object') {
+    scaleContext((+localStorage.getItem('scale') || 1))
+    console.log(scale)
+}
+
+function translate (realx, realy) {
+    var tx = realx / scale, ty = realy / scale
+    origin.set(origin.add(new Vector(realx, realy)))
+    ctx.translate(tx, ty)
+}
+
+function getCanvasClientPoint (e) {
+    var x, y
+    if (e.pageX || e.pageY) {
+      x = e.pageX;
+      y = e.pageY;
+    } else {
+      x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft
+      y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+    }
+    x -= canvas.offsetLeft
+    y -= canvas.offsetTop
+    return new Vector(x, y)
+}
+
+translate(w / 2, h / 2)
+
+var mouse = {
+    p: new Vector(),
+    v: new Vector()
+}
+
+var gravity = +$('#gravity').val(), particles = []
+
+$('#vvector').change(function (e) {
+    showVVector = $(this).is(':checked')
+})
+
+$('#gravity').change(function () {
+    gravity = +$(this).val()
+})
+
+$('input').keydown(function (e) { e.stopPropagation() })
+
+$(window)
+    .on('keydown', function (e) {
+        switch (e.which) {
+            case 37:
+                translate(10, 0);
+                e.preventDefault()
+                e.stopPropagation()
+                return false
+                break;
+            case 38:
+                translate(0, 10);
+                e.preventDefault()
+                e.stopPropagation()
+                return false
+                break;
+            case 39:
+                translate(-10, 0);
+                e.preventDefault()
+                e.stopPropagation()
+                return false
+                break;
+            case 40:
+                translate(0, -10);
+                e.preventDefault()
+                e.stopPropagation()
+                return false
+                break;
+        }
+    })
+
+$(canvas)
+    .on('mousedown', function (e) {
+        e = e.originalEvent
+        mouse.p.set(getCanvasClientPoint(e))
+        mouse.v.set(0)
+        var sizeBase = +$("#size").val()
+        mouse.circle = new Circle(mouse.p.sub(origin).div(scale), Math.random() * 15 + sizeBase, new Vector())
+    })
+    .on('mouseup', function (e) {
+        e = e.originalEvent
+        mouse.v.set(getCanvasClientPoint(e).sub(mouse.p).div(30))
+        mouse.circle.v.set(mouse.v)
+        particles.push(mouse.circle)
+        $("#counter").val(particles.length)
+    })
+    .on('mousewheel', function (e) {
+        e = e.originalEvent
+        var times = e.wheelDelta < 0 ? 0.95 :  1 / 0.95
+        if (scale * times > 0.01 && scale * times < 10) {
+            scaleContext(times)
+            var delta = getCanvasClientPoint(e).sub(origin).mul(1 - times)
+            translate(delta.x, delta.y)
+        }
+        e.stopPropagation()
+        e.preventDefault()
+        return false
+    })
+    .on('scroll', function (e) { e.stopPropagation() })
 
 function update () {
     for (var k = 0; k < 4; k++) doPhysics(0.25)

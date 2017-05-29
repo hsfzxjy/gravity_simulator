@@ -6,24 +6,37 @@
     </head>
     <body>
         <div id="control-box">
-            Press <kbd>A</kbd> to zoom out, and <kbd>S</kbd> to zoom in.
-            <br>
-            Press <kbd>&#x2190;</kbd>, <kbd>&#x2191;</kbd>, <kbd>&#x2192;</kbd>, <kbd>&#x2193;</kbd> to move the viewport.
-            <br><br>
-            Click anywhere in the right box, and the system will generate an object with random mass. You may drag your mouse before releasing it to give the object an initial velocity.
-            <br><br>
+            <ul>
+                <li>
+                    Click anywhere in the right box, and the system will generate an object with random mass. You may drag your mouse before releasing it to give the object an initial velocity.
+                </li>
+                <li>
+                    Press <kbd>&#x2190;</kbd>, <kbd>&#x2191;</kbd>, <kbd>&#x2192;</kbd>, <kbd>&#x2193;</kbd> to move the viewport.
+                </li>
+                <li>
+                    Scroll the mouse wheel to zoom the viewport.
+                </li>
+            </ul>
             Have fun!
-            <br><br>
+            <br>
             <input type="checkbox" id="vvector" checked><label for="vvector">show velocity vector</label>
             <br>
             <label for="size">Size: </label>
             <input type="number" max="100" min="1" id="size" value="10">
             <br>
             <label for="gravity">Gravity: </label>
-            <input type="number" min="1" id="gravity" value="30">
+            <input type="number" min="1" id="gravity" value="2">
+            <br>
+            <label for="counter">Object counter: </label>
+            <input type="number" id="counter" value="0" disabled>
             <br><br>
             <button onclick="location.reload()">reset</button>
-            &nbsp; <span id="counter"></span>
+            <br>
+            <small id="copyright">
+                Authored by <a href="https://github.com/hsfzxjy">hsfzxjy</a>, hosted at Github Pages.
+                <br>
+                <a href="https://github.com/hsfzxjy/gravity_simulator">Source Code</a>
+            </small>
         </div>
         <canvas id="canvas" width="600" height="500">
             Please update your browser to enjoy the simulation.

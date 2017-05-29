@@ -1,23 +1,39 @@
+* {
+    box-sizing: border-box;
+}
+
 html, body {
     margin: 0px;
     padding: 0px;
     background-color: #000;
     height: 100%;
+    min-width: 970px;
+    min-height: 600px;
+    position: relative;
 }
+
+body {
+    overflow: auto;
+}
+
 #control-box {
     height: 500px;
     width: 300px;
     left: 70px;
     top: 50%;
     margin-top: -250px;
-    position: fixed;
+    position: absolute;
     border: 1px dashed white;
     color: #ccc;
     font-family: Arial;
     padding: 10px;
     max-height: 500px;
     line-height: 1.4;
-    box-sizing: border-box;
+}
+
+#control-box ul {
+    margin: 8px 0;
+    padding-left: 20px;
 }
 
 #control-box kbd {
@@ -25,20 +41,78 @@ html, body {
     border: 1px solid #bbb;
 }
 
+#control-box input[type=number] {
+    float: right;
+    width: 150px;
+    background: #000;
+    box-shadow: none;
+    border: 1px solid #aaa;
+    color: #aaa;
+}
+
+#control-box input[type=number]:hover, #control-box input[type=number]:focus {
+    border-color: #eee;
+    color: #eee;
+    outline: 0;
+}
+
+#control-box input[disabled] {
+    border: 0;
+    font-size: 1rem;
+    color: #aaa!important;
+}
+
+#control-box button {
+    display: block;
+    width: 100%;
+    height: 2em;
+    box-shadow: none;
+    background: #000;
+    border: 1px dashed #aaa;
+    color: #aaa;
+    text-transform: uppercase;
+}
+
+#control-box button:focus, #control-box button:hover {
+    color: #eee;
+    border-color: #eee;
+    cursor: pointer;
+    outline: 0;
+}
+
+#copyright {
+    text-align: center;
+    display: block;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 5px;
+    padding-bottom: 15px
+}
+
+#copyright a {
+    color: #0A7;
+    text-decoration: none;
+}
+
+#copyright a:hover {
+    color: #00c68b;
+}
+
 #canvas {
     border: 1px solid #fff;
     border-radius: 0px;
-    position: fixed;
+    position: absolute;
     width: 600px;
     height: 500px;
-    left: 50%;
+    left: 500px;
     top: 50%;
-    margin-left: -100px;
+    margin-right: 100px;
     margin-top: -250px;
-    box-sizing: border-box;
     padding: 0px;
     background-color: #111;
     cursor: default;
     z-index: 0;
-    overflow: auto;
+    color: #eee
 }
