@@ -226,14 +226,14 @@ var mouse = {
     v: new Vector()
 }
 
-var gravity = +$('#gravity').val(), particles = []
+var gravity = +$('#gravity').val() || 10, particles = []
 
 $('#vvector').change(function (e) {
     showVVector = $(this).is(':checked')
 })
 
 $('#gravity').change(function () {
-    gravity = +$(this).val()
+    gravity = +$(this).val() || 10
 })
 
 $('input').keydown(function (e) { e.stopPropagation() })
@@ -273,7 +273,7 @@ $(canvas)
         e = e.originalEvent
         mouse.p.set(getCanvasClientPoint(e))
         mouse.v.set(0)
-        var sizeBase = +$("#size").val()
+        var sizeBase = +$("#size").val() || sizeBase
         mouse.circle = new Circle(mouse.p.sub(origin).div(scale), Math.random() * 15 + sizeBase, new Vector())
     })
     .on('mouseup', function (e) {
