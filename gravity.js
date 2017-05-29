@@ -197,7 +197,6 @@ function scaleContext (times) {
 
 if (typeof window.localStorage === 'object') {
     scaleContext((+localStorage.getItem('scale') || 1))
-    console.log(scale)
 }
 
 function translate (realx, realy) {
